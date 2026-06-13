@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f0f4f8; }
+    h1 { color: #2d3748; text-align: center; }
+    .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    input { width: 100%; padding: 10px; margin-top: 8px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #4299e1; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 8px; }
+    button:hover { background: #3182ce; }
+    .remove-btn { background: #fc8181; margin-top: 4px; }
+    .remove-btn:hover { background: #e53e3e; }
+    .result { text-align: center; font-size: 24px; font-weight: bold; padding: 16px; border-radius: 12px; }
+    .positive { background: #c6f6d5; color: #276749; }
+    .negative { background: #fed7d7; color: #9b2c2c; }
+    .expense-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <h1>💰 Budget Calculator</h1>
+  <div class="card">
+    <h2>Income</h2>
+    <input type="number" id="income" placeholder="Enter your income" />
+  </div>
+  <div class="card">
+    <h2>Add Expense</h2>
+    <input type="text" id="expenseName" placeholder="Expense name (e.g. Rent)" />
+    <input type="number" id="expenseAmount" placeholder="Amount" />
+    <button onclick="addExpense()">+ Add Expense</button>
+  </div>
+  <div class="card">
+    <h2>Expenses</h2>
+    <div id="expenseList"><p style="color:#a0aec0">No expenses yet</p></div>
+  </div>
+  <div class="card">
+    <button onclick="calculate()">Calculate</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    let expenses = [];
+    function addExpense() {
+      const name = document.getElementById('expenseName').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      if (!name || isNaN(amount)) return alert('Please enter a name and amount!');
+      expenses.push({ name, amount });
+      document.getElementById('expenseName').value = '';
+      document.getElementById('expenseAmount').value = '';
+      renderExpenses();
+    }
+    function removeExpense(i) {
+      expenses.splice(i, 1);
+      renderExpenses();
+    }
+    function renderExpenses() {
+      const list = document.getElementById('expenseList');
+      if (expenses.length === 0) { list.innerHTML = '<p style="color:#a0aec0">No expenses yet</p>'; return; }
+      list.innerHTML = expenses.map((e, i) => `<div class="expense-item"><span>${e.name}</span><span>$${e.amount.toFixed(2)} <button class="remove-btn" onclick="removeExpense(${i})">✕</button></span></div>`).join('');
+    }
+    function calculate() {
+      const income = parseFloat(document.getElementById('income').value);
+      if (isNaN(income)) return alert('Please enter your income!');
+      const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const left = income - total;
+      const result = document.getElementById('result');
+      result.className = 'result ' + (left >= 0 ? 'positive' : 'negative');
+      result.innerHTML = `${left >= 0 ? '✅' : '⚠️'} Balance: $${left.toFixed(2)}<br><small>Income: $${income.toFixed(2)} | Expenses: $${total.toFixed(2)}</small>`;
+    }
+  </script>
+</body>
+</html>
